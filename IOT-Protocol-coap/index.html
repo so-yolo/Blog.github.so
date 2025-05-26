@@ -27,20 +27,20 @@
 <meta property="og:description" content="IOT协议之Coap 前言上一篇讲的是MQTT协议，今天就讲讲Coap协议吧，两者都是应用层协议，我们也是从原理加抓包分析起手  什么是Coap协议？​	受限应用协议（CoAP）是一种专门的web传输协议，用于受限节点和受限（例如，低功耗、有损）网络。节点通常有8位微控制器，带有少量ROM和RAM，而受限网络，如低功率无线个人区域网络（6LoWPANs）上的IPv6，通常具有高分组错误率和10s">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526063657847.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526064948717.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526070635305.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526073545501.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526074148979.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526074431703.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526075038241.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526074844346.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526075306891.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526081500420.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526080951327.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526082611509.png">
-<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-Coap/image-20250526082048066.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526064948717.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526070635305.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526073545501.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526074148979.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526074431703.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526075038241.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526074844346.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526075306891.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526081500420.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526080951327.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526082611509.png">
+<meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-coap/image-20250526082048066.png">
 <meta property="article:published_time" content="2025-05-25T21:49:03.000Z">
-<meta property="article:modified_time" content="2025-05-26T01:13:18.557Z">
+<meta property="article:modified_time" content="2025-05-26T01:29:02.381Z">
 <meta property="article:author" content="罗兰度">
 <meta property="article:tag" content="protocol">
 <meta name="twitter:card" content="summary_large_image">
@@ -384,8 +384,8 @@
 <p>​	在头部、token和选项之后，是<strong>payload部分</strong>（可以没有payload）。如果有payload，并且长度不为0，那么payload之前有一个固定长度为一个字节的payload标识符（0xFF），它标志着选项部分的结束和payload部分的开始。payload部分从标识符之后开始，一直到这个UDP数据报结束，也就是说，payload部分的长度可以根据UDP数据报的长度计算出来。如果没有payload标识符，那么就代表这是一个0长度的payload。如果存在payload标识符但其后跟随的是0长度的payload，那么必须当作消息格式错误处理。</p>
 <p>​	实现注意：0xFF这个值有可能出现在一个选项的长度或选项的值中，所以简单的扫描0xFF来寻找payload标识符是不可行的。作为payload标识符的0xFF只可能出现在一个选项结束之后下一个选项有可能开始的地方。</p>
 <p><strong>option的详细解析</strong></p>
-<p>​	CoAP定义了许多option。消息中的每个option都有一个option编号，option值长度，和option值。 消息中的option号（TLV格式中的T）并不是直接指定option编号的。所有的option必须按实际option编号的递增排列，某一个option和上一个option之间的option编号差值为delta；每一个TLV格式的option号都是delta值（数据包中第一个option的delta即它的option编号）。同一个编号的option再次出现时，delta的值为0。<br><img src="/./IOT-Protocol-Coap/image-20250526064948717.png" srcset="/img/loading.gif" lazyload alt="image-20250526064948717"></p>
-<p>CoAP中所有的Option都采用编号的方式，这些Option及编号的定义如下图所示。<img src="/./IOT-Protocol-Coap/image-20250526070635305.png" srcset="/img/loading.gif" lazyload alt="image-20250526070635305"></p>
+<p>​	CoAP定义了许多option。消息中的每个option都有一个option编号，option值长度，和option值。 消息中的option号（TLV格式中的T）并不是直接指定option编号的。所有的option必须按实际option编号的递增排列，某一个option和上一个option之间的option编号差值为delta；每一个TLV格式的option号都是delta值（数据包中第一个option的delta即它的option编号）。同一个编号的option再次出现时，delta的值为0。<br><img src="/./IOT-Protocol-coap/image-20250526064948717.png" srcset="/img/loading.gif" lazyload alt="image-20250526064948717"></p>
+<p>CoAP中所有的Option都采用编号的方式，这些Option及编号的定义如下图所示。<img src="/./IOT-Protocol-coap/image-20250526070635305.png" srcset="/img/loading.gif" lazyload alt="image-20250526070635305"></p>
 </li>
 <li><p><strong>双层架构</strong>  </p>
 <ul>
@@ -425,13 +425,13 @@
 </ul>
 <h2 id="实践抓包分析"><a href="#实践抓包分析" class="headerlink" title="实践抓包分析"></a>实践抓包分析</h2><h3 id="准备工作："><a href="#准备工作：" class="headerlink" title="准备工作："></a>准备工作：</h3><p>我们需要进行下载一个Coap的客户端，这里我用的Coap_shell,下载链接放在下面了<br><code>链接: https://pan.baidu.com/s/1soGdqIlOBQe968_wezxq7Q 密码: rw6o</code></p>
 <p>下载完之后在命令行运行<br><code>java -jar coap-shell.jar</code></p>
-<p>可以用coap:&#x2F;&#x2F;coap.me作为测试服务器，输入下列命令连接服务器：<br><img src="/./IOT-Protocol-Coap/image-20250526073545501.png" srcset="/img/loading.gif" lazyload alt="image-20250526073545501"></p>
-<p>wireshark的捕获方式使用的是WLAN<br><img src="/./IOT-Protocol-Coap/image-20250526074148979.png" srcset="/img/loading.gif" lazyload alt="image-20250526074148979"></p>
-<h3 id="分析："><a href="#分析：" class="headerlink" title="分析："></a>分析：</h3><p>运行discover,发现资源<br><img src="/./IOT-Protocol-Coap/image-20250526074431703.png" srcset="/img/loading.gif" lazyload alt="image-20250526074431703"></p>
+<p>可以用coap:&#x2F;&#x2F;coap.me作为测试服务器，输入下列命令连接服务器：<br><img src="/./IOT-Protocol-coap/image-20250526073545501.png" srcset="/img/loading.gif" lazyload alt="image-20250526073545501"></p>
+<p>wireshark的捕获方式使用的是WLAN<br><img src="/./IOT-Protocol-coap/image-20250526074148979.png" srcset="/img/loading.gif" lazyload alt="image-20250526074148979"></p>
+<h3 id="分析："><a href="#分析：" class="headerlink" title="分析："></a>分析：</h3><p>运行discover,发现资源<br><img src="/./IOT-Protocol-coap/image-20250526074431703.png" srcset="/img/loading.gif" lazyload alt="image-20250526074431703"></p>
 <p>我们可以使用GET,POST,PUT,DELETE的请求方式进行资源的操作。</p>
-<h4 id="以con类型为例"><a href="#以con类型为例" class="headerlink" title="以con类型为例"></a>以con类型为例</h4><p>我们先运行get &#x2F;hello<br><img src="/./IOT-Protocol-Coap/image-20250526075038241.png" srcset="/img/loading.gif" lazyload alt="image-20250526075038241"></p>
+<h4 id="以con类型为例"><a href="#以con类型为例" class="headerlink" title="以con类型为例"></a>以con类型为例</h4><p>我们先运行get &#x2F;hello<br><img src="/./IOT-Protocol-coap/image-20250526075038241.png" srcset="/img/loading.gif" lazyload alt="image-20250526075038241"></p>
 <p>使用wireshark抓包分析</p>
-<p><img src="/./IOT-Protocol-Coap/image-20250526074844346.png" srcset="/img/loading.gif" lazyload alt="image-20250526074844346"></p>
+<p><img src="/./IOT-Protocol-coap/image-20250526074844346.png" srcset="/img/loading.gif" lazyload alt="image-20250526074844346"></p>
 <p>我们进入CON的报文类型中分析，对比一下上面图片的报文格式</p>
 <ul>
 <li>version是比特01</li>
@@ -447,11 +447,11 @@
 <li><p>token一共是16个十六进制的数也就是8个字节</p>
 </li>
 </ul>
-<p><img src="/./IOT-Protocol-Coap/image-20250526075306891.png" srcset="/img/loading.gif" lazyload alt="image-20250526075306891"></p>
-<p>我们现在来看看option的部分<br>这个CON的消息类型中存在三个option选项，opt Delta的比特是0011，opt length的比特是0101，两个加一块正好是一个字节，符合下面的这个图，uri-host是属于option value，是7个字节，剩下的两个option也是如此。<br><img src="/./IOT-Protocol-Coap/image-20250526081500420.png" srcset="/img/loading.gif" lazyload alt="image-20250526081500420"></p>
-<p><img src="/./IOT-Protocol-Coap/image-20250526080951327.png" srcset="/img/loading.gif" lazyload alt="image-20250526080951327"><br>这个con里面不存在payload，我们也可以看到没有0xff的十六进制。</p>
-<h4 id="以ack类型为例"><a href="#以ack类型为例" class="headerlink" title="以ack类型为例"></a>以ack类型为例</h4><p>前面的分析就跳过了，直接步入payload的分析，我们可以看到0xff的后面就是payload的内容了，world，是五个字节的长度，正好是world的ascll码<br><img src="/./IOT-Protocol-Coap/image-20250526082611509.png" srcset="/img/loading.gif" lazyload alt="image-20250526082611509"></p>
-<p><img src="/./IOT-Protocol-Coap/image-20250526082048066.png" srcset="/img/loading.gif" lazyload alt="image-20250526082048066"></p>
+<p><img src="/./IOT-Protocol-coap/image-20250526075306891.png" srcset="/img/loading.gif" lazyload alt="image-20250526075306891"></p>
+<p>我们现在来看看option的部分<br>这个CON的消息类型中存在三个option选项，opt Delta的比特是0011，opt length的比特是0101，两个加一块正好是一个字节，符合下面的这个图，uri-host是属于option value，是7个字节，剩下的两个option也是如此。<br><img src="/./IOT-Protocol-coap/image-20250526081500420.png" srcset="/img/loading.gif" lazyload alt="image-20250526081500420"></p>
+<p><img src="/./IOT-Protocol-coap/image-20250526080951327.png" srcset="/img/loading.gif" lazyload alt="image-20250526080951327"><br>这个con里面不存在payload，我们也可以看到没有0xff的十六进制。</p>
+<h4 id="以ack类型为例"><a href="#以ack类型为例" class="headerlink" title="以ack类型为例"></a>以ack类型为例</h4><p>前面的分析就跳过了，直接步入payload的分析，我们可以看到0xff的后面就是payload的内容了，world，是五个字节的长度，正好是world的ascll码<br><img src="/./IOT-Protocol-coap/image-20250526082611509.png" srcset="/img/loading.gif" lazyload alt="image-20250526082611509"></p>
+<p><img src="/./IOT-Protocol-coap/image-20250526082048066.png" srcset="/img/loading.gif" lazyload alt="image-20250526082048066"></p>
 <p>​	其他的请求方式，或RST,NON的类型就不分析了，我没时间去构造这样的情况了。反正分析起来就是如此了，想深入分析的话建议还是去建议看官方文档，那里面很详细，做协议开发的话还是得仔细看的，等到后卖面再用到的话再说吧。</p>
 
                 
