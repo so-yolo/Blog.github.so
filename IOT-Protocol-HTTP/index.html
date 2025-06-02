@@ -54,7 +54,7 @@
 <meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-HTTP/image-20250602200702212.png">
 <meta property="og:image" content="https://so-yolo.github.io/IOT-Protocol-HTTP/image-20250602200715976.png">
 <meta property="article:published_time" content="2025-06-02T05:52:01.000Z">
-<meta property="article:modified_time" content="2025-06-02T12:10:30.786Z">
+<meta property="article:modified_time" content="2025-06-02T12:14:12.608Z">
 <meta property="article:author" content="罗兰度">
 <meta property="article:tag" content="protocol">
 <meta name="twitter:card" content="summary_large_image">
@@ -710,7 +710,7 @@
 <h4 id="单调递增的-Packet-Number"><a href="#单调递增的-Packet-Number" class="headerlink" title="单调递增的 Packet Number"></a>单调递增的 Packet Number</h4><p>TCP 为了保证可靠性，使用 Sequence Number 和 ACK 来确认消息是否有序到达，但这样的设计存在缺陷。</p>
 <p>超时发生后客户端发起重传，后来接收到了 ACK 确认消息，但因为原始请求和重传请求接收到的 ACK 消息一样，所以客户端就郁闷了，不知道这个 ACK 对应的是原始请求还是重传请求。如果客户端认为是原始请求的 ACK，但实际上是左图的情形，则计算的采样 RTT 偏大；如果客户端认为是重传请求的 ACK，但实际上是右图的情形，又会导致采样 RTT 偏小。图中有几个术语，RTO 是指超时重传时间（Retransmission TimeOut），跟我们熟悉的 RTT（Round Trip Time，往返时间）很长得很像。采样 RTT 会影响 RTO 计算，超时时间的准确把握很重要，长了短了都不合适。</p>
 <p>QUIC 解决了上面的歧义问题。与 Sequence Number 不同的是，Packet Number 严格单调递增，如果 Packet N 丢失了，那么重传时 Packet 的标识不会是 N，而是比 N 大的数字，比如 N + M，这样发送方接收到确认消息时就能方便地知道 ACK 对应的是原始请求还是重传请求。</p>
-<h3 id="ACK-Delay"><a href="#ACK-Delay" class="headerlink" title="ACK Delay"></a>ACK Delay</h3><p><img src="/./IOT-Protocol-HTTP/image-20250602200633799.png" srcset="/img/loading.gif" lazyload alt="image-20250602200633799"></p>
+<h4 id="ACK-Delay"><a href="#ACK-Delay" class="headerlink" title="ACK Delay"></a>ACK Delay</h4><p><img src="/./IOT-Protocol-HTTP/image-20250602200633799.png" srcset="/img/loading.gif" lazyload alt="image-20250602200633799"></p>
 <p>TCP 计算 RTT 时没有考虑接收方接收到数据到发送确认消息之间的延迟，如下图所示，这段延迟即 ACK Delay。QUIC 考虑了这段延迟，使得 RTT 的计算更加准确。</p>
 <h4 id="更多的-ACK-块"><a href="#更多的-ACK-块" class="headerlink" title="更多的 ACK 块"></a>更多的 ACK 块</h4><p><img src="/./IOT-Protocol-HTTP/image-20250602200644643.png" srcset="/img/loading.gif" lazyload alt="image-20250602200644643"></p>
 <p>一般来说，接收方收到发送方的消息后都应该发送一个 ACK 回复，表示收到了数据。但每收到一个数据就返回一个 ACK 回复太麻烦，所以一般不会立即回复，而是接收到多个数据后再回复，TCP SACK 最多提供 3 个 ACK block。但有些场景下，比如下载，只需要服务器返回数据就好，但按照 TCP 的设计，每收到 3 个数据包就要“礼貌性”地返回一个 ACK。而 QUIC 最多可以捎带 256 个 ACK block。在丢包率比较严重的网络下，更多的 ACK block 可以减少重传量，提升网络效率。</p>
